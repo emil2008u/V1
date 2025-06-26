@@ -1,0 +1,21 @@
+{
+  "canisters": {
+    "frontend": {
+      "type": "assets",
+      "source": ["./"],
+      "candid": "src/frontend/frontend.did"
+    }
+  },
+  "dfx": "0.17.0",
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:4943",
+      "type": "ephemeral"
+    }
+  },
+  "defaults": {
+    "build": {
+      "output": "dist"
+    }
+  }
+}
