@@ -1,130 +1,332 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Solo Leveling: Система Гравця</title>
-  <style>
-    body {
-      font-family: monospace;
-      background: linear-gradient(135deg, #000000, #1a1a1a);
-      color: #00ffcc;
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 30px #00ffcc33;
-    }
-    h1 {
-      text-align: center;
-      color: #00ffee;
-      text-shadow: 0 0 10px #00ffee;
-    }
-    .box {
-      background: #111;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      border: 1px solid #00ffaa33;
-    }
-    .box div {
-      margin: 6px 0;
-    }
-    .desc {
-      font-style: italic;
-      color: #77ffe1;
-      min-height: 30px;
-    }
-    input[type=number], button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: none;
-    }
-    input {
-      background: #222;
-      color: #00ffcc;
-    }
-    button {
-      background: #00ffcc;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #00ccaa;
-    }
-    #raidTimer {
-      text-align: center;
-      margin-top: 8px;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Solo Leveling: Прокачка Героя</title>
+<style>
+  body {
+    font-family: monospace;
+    background: linear-gradient(135deg, #000000, #1a1a1a);
+    color: #00ffcc;
+    max-width: 650px;
+    margin: 40px auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 30px #00ffcc33;
+  }
+  h1 {
+    text-align: center;
+    color: #00ffee;
+    text-shadow: 0 0 10px #00ffee;
+  }
+  .box {
+    background: #111;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #00ffaa33;
+  }
+  .box div {
+    margin: 6px 0;
+  }
+  .desc {
+    font-style: italic;
+    color: #77ffe1;
+    white-space: pre-line;
+    min-height: 60px;
+  }
+  input[type=number], button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: none;
+  }
+  input {
+    background: #222;
+    color: #00ffcc;
+  }
+  button {
+    background: #00ffcc;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  button:hover:not(:disabled) {
+    background: #00ccaa;
+  }
+  button:disabled {
+    background: #004d40;
+    cursor: not-allowed;
+  }
+  #raidTimer {
+    text-align: center;
+    margin-top: 8px;
+    font-weight: bold;
+  }
+</style>
 </head>
 <body>
 
-  <h1>📟 Інтерфейс Гравця</h1>
+<h1>📟 Solo Leveling: Прокачка Героя</h1>
 
-  <div class="box">
-    <div><strong>Рівень:</strong> <span id="level">1</span></div>
-    <div><strong>XP:</strong> <span id="xp">0</span> / <span id="nextXp">100</span></div>
-    <div><strong>Сила:</strong> <span id="strength">5</span></div>
-    <div><strong>Витривалість:</strong> <span id="stamina">5</span></div>
-    <div><strong>Гнучкість:</strong> <span id="flexibility">5</span></div>
-    <div><strong>Очки навичок:</strong> <span id="skillPoints">0</span></div>
-  </div>
+<div class="box">
+  <div><strong>Рівень:</strong> <span id="level">1</span></div>
+  <div><strong>XP:</strong> <span id="xp">0</span> / <span id="nextXp">100</span></div>
+  <div><strong>Сила:</strong> <span id="strength">5</span></div>
+  <div><strong>Витривалість:</strong> <span id="stamina">5</span></div>
+  <div><strong>Гнучкість:</strong> <span id="flexibility">5</span></div>
+  <div><strong>Очки навичок:</strong> <span id="skillPoints">0</span></div>
+</div>
 
-  <div class="box">
-    <h3>📘 Реальне Тренування</h3>
-    <div class="desc" id="trainingDesc">Натисни, щоб отримати завдання</div>
-    <button id="startTrainingBtn">📝 Отримати Завдання</button>
-    <div id="realTask"></div>
-    <button id="confirmDoneBtn" style="display:none;">✅ Я виконав</button>
-    <div><strong>Рівень тренування:</strong> <span id="trainingLevel">1</span> / 100</div>
-  </div>
+<div class="box">
+  <h3>📘 Тренування</h3>
+  <div class="desc" id="trainingDesc">Натисни "Отримати Завдання", щоб побачити вправи</div>
+  <button id="startTrainingBtn">📝 Отримати Завдання</button>
+  <div id="realTask"></div>
+  <button id="confirmDoneBtn" style="display:none;">✅ Я виконав тренування</button>
+  <div><strong>Рівень тренування:</strong> <span id="trainingLevel">1</span> / 100</div>
+</div>
 
-  <div class="box">
-    <h3>🛡 Рейд</h3>
-    <div class="desc" id="raidDesc">Натисни, щоб почати рейд</div>
-    <button id="doRaidBtn">⚔️ Вийти на рейд</button>
-    <div id="raidTimer"></div>
-    <div><strong>Рівень рейду:</strong> <span id="raidLevel">1</span> / 1000</div>
-  </div>
+<div class="box">
+  <h3>🛡 Рейд</h3>
+  <div class="desc" id="raidDesc">Натисни "Вийти на рейд", щоб розпочати</div>
+  <button id="doRaidBtn">⚔️ Вийти на рейд</button>
+  <div id="raidTimer"></div>
+  <div><strong>Рівень рейду:</strong> <span id="raidLevel">1</span> / 1000</div>
+</div>
 
-  <div class="box">
-    <h3>⚙️ Розподіл Очок Навичок</h3>
-    <label>Сила:</label>
-    <input type="number" id="strengthPoints" min="0" value="0">
-    <label>Витривалість:</label>
-    <input type="number" id="staminaPoints" min="0" value="0">
-    <label>Гнучкість:</label>
-    <input type="number" id="flexibilityPoints" min="0" value="0">
-    <button id="allocateBtn">📤 Розподілити</button>
-  </div>
+<div class="box">
+  <h3>⚙️ Розподіл Очок Навичок</h3>
+  <label>Сила:</label>
+  <input type="number" id="strengthPoints" min="0" value="0" />
+  <label>Витривалість:</label>
+  <input type="number" id="staminaPoints" min="0" value="0" />
+  <label>Гнучкість:</label>
+  <input type="number" id="flexibilityPoints" min="0" value="0" />
+  <button id="allocateBtn">📤 Розподілити</button>
+</div>
 
-  <script>
-    // DOM elements
-    const levelEl = document.getElementById('level');
-    const xpEl = document.getElementById('xp');
-    const nextXpEl = document.getElementById('nextXp');
-    const strengthEl = document.getElementById('strength');
-    const staminaEl = document.getElementById('stamina');
-    const flexibilityEl = document.getElementById('flexibility');
-    const skillPointsEl = document.getElementById('skillPoints');
-    const trainingLevelEl = document.getElementById('trainingLevel');
-    const trainingDescEl = document.getElementById('trainingDesc');
-    const raidLevelEl = document.getElementById('raidLevel');
-    const raidDescEl = document.getElementById('raidDesc');
-    const raidTimerEl = document.getElementById('raidTimer');
-    const realTask = document.getElementById('realTask');
+<script>
+  const levelEl = document.getElementById('level');
+  const xpEl = document.getElementById('xp');
+  const nextXpEl = document.getElementById('nextXp');
+  const strengthEl = document.getElementById('strength');
+  const staminaEl = document.getElementById('stamina');
+  const flexibilityEl = document.getElementById('flexibility');
+  const skillPointsEl = document.getElementById('skillPoints');
+  const trainingLevelEl = document.getElementById('trainingLevel');
+  const trainingDescEl = document.getElementById('trainingDesc');
+  const raidLevelEl = document.getElementById('raidLevel');
+  const raidDescEl = document.getElementById('raidDesc');
+  const raidTimerEl = document.getElementById('raidTimer');
+  const realTask = document.getElementById('realTask');
 
-    const strengthPointsInput = document.getElementById('strengthPoints');
-    const staminaPointsInput = document.getElementById('staminaPoints');
-    const flexibilityPointsInput = document.getElementById('flexibilityPoints');
+  const strengthPointsInput = document.getElementById('strengthPoints');
+  const staminaPointsInput = document.getElementById('staminaPoints');
+  const flexibilityPointsInput = document.getElementById('flexibilityPoints');
 
-    const startTrainingBtn = document.getElementById('startTrainingBtn');
+  const startTrainingBtn = document.getElementById('startTrainingBtn');
+  const confirmDoneBtn = document.getElementById('confirmDoneBtn');
+  const doRaidBtn = document.getElementById('doRaidBtn');
+  const allocateBtn = document.getElementById('allocateBtn');
+
+  let player = JSON.parse(localStorage.getItem('playerData')) || {
+    level: 1,
+    xp: 0,
+    nextXp: 100,
+    strength: 5,
+    stamina: 5,
+    flexibility: 5,
+    skillPoints: 0,
+    trainingLevel: 1,
+    raidLevel: 1
+  };
+
+  function saveData() {
+    localStorage.setItem('playerData', JSON.stringify(player));
+  }
+
+  function updateDisplay() {
+    levelEl.textContent = player.level;
+    xpEl.textContent = player.xp;
+    nextXpEl.textContent = player.nextXp;
+    strengthEl.textContent = player.strength;
+    staminaEl.textContent = player.stamina;
+    flexibilityEl.textContent = player.flexibility;
+    skillPointsEl.textContent = player.skillPoints;
+    trainingLevelEl.textContent = player.trainingLevel;
+    raidLevelEl.textContent = player.raidLevel;
+    raidDescEl.textContent = `Рейд ${player.raidLevel}: Монстр атакує ${raidAttackCount(player.raidLevel)} разів! Виживи!`;
+  }
+
+  function levelUp() {
+    player.level++;
+    player.skillPoints += 5;
+    player.nextXp = Math.floor(player.nextXp * 1.2);
+    alert(`🎉 РІВЕНЬ ПІДВИЩЕНО! Тепер ти ${player.level}-го рівня (+5 очок навичок)`);
+  }
+
+  function gainXp(amount) {
+    player.xp += amount;
+    while (player.xp >= player.nextXp) {
+      player.xp -= player.nextXp;
+      levelUp();
+    }
+    saveData();
+    updateDisplay();
+  }
+
+  // Список вправ
+  const exercises = [
+    {name: "Віджимання", unit: "повторень", base: 100},
+    {name: "Присідання", unit: "повторень", base: 30},
+    {name: "Берпі", unit: "повторень", base: 50},
+    {name: "Планка", unit: "секунд", base: 30},
+    {name: "Прес (скручування)", unit: "повторень", base: 40},
+    {name: "Альпініст", unit: "повторень", base: 60},
+    {name: "Випади", unit: "повторень", base: 40},
+    {name: "Стрибки зірочкою", unit: "повторень", base: 80},
+    {name: "Супермен", unit: "секунд", base: 30},
+    {name: "Підйом колін стоячи", unit: "повторень", base: 70}
+  ];
+
+  // Генеруємо випадковий набір вправ 4-6 штук з підрахунком складності
+  function generateExercises(level, multiplier=1) {
+    // Кількість вправ 4-6 випадково
+    const count = Math.floor(Math.random() * 3) + 4; // 4,5 або 6
+
+    // Копіюємо масив і перемішуємо (Fisher-Yates)
+    const arr = [...exercises];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+
+    // Беремо count вправ
+    const chosen = arr.slice(0, count);
+
+    // Вираховуємо кількість зростаючи по рівню та множнику (для рейду)
+    const result = chosen.map(ex => {
+      const amount = Math.round(ex.base * (1 + 0.12 * (level -1)) * multiplier);
+      return {name: ex.name, amount, unit: ex.unit};
+    });
+
+    return result;
+  }
+
+  // Для рейду виводимо кількість атак
+  function raidAttackCount(level) {
+    return 30 + level * 3;
+  }
+
+  let currentTraining = null;
+  let currentRaid = null;
+
+  startTrainingBtn.addEventListener('click', () => {
+    if (currentTraining) {
+      alert("Вже є активне тренування. Спочатку заверши його!");
+      return;
+    }
+    const lvl = player.trainingLevel;
+    currentTraining = generateExercises(lvl);
+    trainingDescEl.textContent = `Тренування ${lvl}`;
+    realTask.textContent = currentTraining.map(ex => `- ${ex.name}: ${ex.amount} ${ex.unit}`).join('\n');
+    confirmDoneBtn.style.display = 'block';
+  });
+
+  confirmDoneBtn.addEventListener('click', () => {
+    if (!currentTraining) {
+      alert("Спочатку отримай завдання тренування.");
+      return;
+    }
+    const xpEarned = 15 + player.trainingLevel * 12;
+    alert(`✅ Молодець! Ти отримав ${xpEarned} XP за тренування.`);
+    gainXp(xpEarned);
+    if (player.trainingLevel < 100) player.trainingLevel++;
+    confirmDoneBtn.style.display = 'none';
+    realTask.textContent = '';
+    currentTraining = null;
+    saveData();
+    updateDisplay();
+  });
+
+  doRaidBtn.addEventListener('click', () => {
+    if (currentRaid) {
+      alert("Вже йде рейд! Завершіть поточний.");
+      return;
+    }
+    let countdown = 5;
+    doRaidBtn.disabled = true;
+    raidTimerEl.textContent = `⏳ Рейд почнеться за ${countdown} сек...`;
+    currentRaid = generateExercises(player.raidLevel, 1.6);
+
+    const timer = setInterval(() => {
+      countdown--;
+      if (countdown > 0) {
+        raidTimerEl.textContent = `⏳ Рейд почнеться за ${countdown} сек...`;
+      } else {
+        clearInterval(timer);
+        raidTimerEl.textContent = `⚔️ Виконай рейд:\n` + currentRaid.map(ex => `- ${ex.name}: ${ex.amount} ${ex.unit}`).join('\n');
+        confirmRaidBtn.style.display = 'block';
+      }
+    }, 1000);
+  });
+
+  const confirmRaidBtn = document.createElement('button');
+  confirmRaidBtn.textContent = "✅ Я виконав рейд";
+  confirmRaidBtn.style.display = 'none';
+  confirmRaidBtn.style.marginTop = '10px';
+  doRaidBtn.parentNode.appendChild(confirmRaidBtn);
+
+  confirmRaidBtn.addEventListener('click', () => {
+    if (!currentRaid) {
+      alert("Спочатку почни рейд!");
+      return;
+    }
+    const xpEarned = 70 + player.raidLevel * 25;
+    alert(`🔥 Вітаємо! Ти пройшов рейд та отримав ${xpEarned} XP!`);
+    gainXp(xpEarned);
+    if (player.raidLevel < 1000) player.raidLevel++;
+    confirmRaidBtn.style.display = 'none';
+    raidTimerEl.textContent = "";
+    currentRaid = null;
+    doRaidBtn.disabled = false;
+    saveData();
+    updateDisplay();
+  });
+
+  allocateBtn.addEventListener('click', () => {
+    const str = parseInt(strengthPointsInput.value) || 0;
+    const sta = parseInt(staminaPointsInput.value) || 0;
+    const flex = parseInt(flexibilityPointsInput.value) || 0;
+    const total = str + sta + flex;
+
+    if (total > player.skillPoints) {
+      alert("Недостатньо очок навичок!");
+      return;
+    }
+
+    player.strength += str;
+    player.stamina += sta;
+    player.flexibility += flex;
+    player.skillPoints -= total;
+
+    strengthPointsInput.value = 0;
+    staminaPointsInput.value = 0;
+    flexibilityPointsInput.value = 0;
+
+    saveData();
+    updateDisplay();
+  });
+
+  updateDisplay();
+</script>
+
+</body>
+</html>    const startTrainingBtn = document.getElementById('startTrainingBtn');
     const confirmDoneBtn = document.getElementById('confirmDoneBtn');
     const doRaidBtn = document.getElementById('doRaidBtn');
     const allocateBtn = document.getElementById('allocateBtn');
