@@ -1,157 +1,173 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>Solo Leveling UI</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IRL Прокачка — Solo Leveling</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
-
     body {
-      font-family: 'Orbitron', sans-serif;
-      background: linear-gradient(#0c0c0c, #121212);
-      color: #00ccff;
-      padding: 30px;
-      text-shadow: 0 0 5px #00ccff;
-    }
-
-    h1 {
-      text-align: center;
-      color: #00ccff;
-      text-shadow: 0 0 10px #00ccff;
-      font-size: 32px;
-    }
-
-    #stats {
-      border: 2px solid #00ccff;
-      border-radius: 10px;
+      background-color: #0a0f1a;
+      color: #00ffcc;
+      font-family: 'Segoe UI', sans-serif;
       padding: 20px;
-      background-color: rgba(0, 0, 0, 0.4);
-      margin-bottom: 20px;
-      box-shadow: 0 0 15px #00ccff88;
+      margin: 0;
     }
-
-    p {
-      margin: 10px 0;
-    }
-
-    button {
-      margin: 5px;
-      padding: 12px 18px;
-      font-size: 15px;
-      border: 1px solid #00ccff;
-      border-radius: 6px;
-      cursor: pointer;
-      background-color: #0f0f0f;
-      color: #00ccff;
-      text-shadow: 0 0 5px #00ccff;
-      transition: 0.2s ease;
-      box-shadow: 0 0 10px #00ccff33;
-    }
-
-    button:hover {
-      background-color: #00ccff;
-      color: #000;
-      text-shadow: none;
-      box-shadow: 0 0 15px #00ccff;
-    }
-
-    .btn-section {
+    h1, h2 {
       text-align: center;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+    }
+    button {
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      background-color: #00ffcc;
+      color: #000;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #00e6b8;
+    }
+    .exercise-box {
+      background-color: #111827;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 20px;
+      min-height: 120px;
+    }
+    ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+    #stats {
+      text-align: center;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>🧠 Solo Leveling IRL</h1>
 
-  <h1>🌀 Solo Leveling: System</h1>
+    <button onclick="startWorkout()">🏋️‍♂️ Почати тренування</button>
+    <button onclick="startRaid()">⚔️ Почати рейд</button>
+    <div class="exercise-box" id="exerciseList">Натисни кнопку, щоб згенерувати тренування.</div>
+    <button onclick="completeWorkout()">✅ Виконав</button>
 
-  <div id="stats"></div>
-
-  <div class="btn-section">
-    <button onclick="train()">🏋️‍♂️ Тренування</button>
-    <button onclick="raid()">⚔️ Рейд</button>
-    <br><br>
-    <button onclick="upgradeStat('strength')">💪 Прокачати Силу</button>
-    <button onclick="upgradeStat('stamina')">🏃‍♂️ Прокачати Витривалість</button>
-    <button onclick="upgradeStat('flexibility')">🧘‍♂️ Прокачати Гнучкість</button>
+    <div id="stats"></div>
   </div>
 
   <script>
     let player = {
-      level: 1,
       xp: 0,
-      nextXp: 100,
-      strength: 5,
-      stamina: 5,
-      flexibility: 5,
-      skillPoints: 0,
-      trainingLevel: 1,
-      raidLevel: 1
+      level: 1,
+      nextXp: 100
     };
 
-    function saveData() {
-      localStorage.setItem('playerData', JSON.stringify(player));
+    const exercises = [
+      { name: "Віджимання", min: 30, max: 60, xpPerUnit: 1 },
+      { name: "Присідання", min: 50, max: 80, xpPerUnit: 0.5 },
+      { name: "Прес", min: 40, max: 70, xpPerUnit: 0.5 },
+      { name: "Планка (сек)", min: 60, max: 180, xpPerUnit: 0.1 },
+      { name: "Бурпі", min: 15, max: 30, xpPerUnit: 2 },
+      { name: "Випади", min: 30, max: 60, xpPerUnit: 1 },
+      { name: "Біг на місці (сек)", min: 30, max: 90, xpPerUnit: 0.1 },
+      { name: "Стрибки", min: 40, max: 80, xpPerUnit: 0.5 },
+      { name: "Альпіністи", min: 30, max: 60, xpPerUnit: 1 },
+      { name: "Бічна планка (сек)", min: 30, max: 90, xpPerUnit: 0.1 }
+    ];
+
+    let currentWorkout = [];
+
+    function save() {
+      localStorage.setItem("soloLevelingPlayer", JSON.stringify(player));
     }
 
-    function loadData() {
-      const saved = localStorage.getItem('playerData');
-      if (saved) {
-        player = JSON.parse(saved);
-      }
+    function load() {
+      const data = localStorage.getItem("soloLevelingPlayer");
+      if (data) player = JSON.parse(data);
     }
 
-    function updateDisplay() {
-      document.getElementById('stats').innerHTML = `
-        <p>📈 Рівень: ${player.level}</p>
-        <p>⭐ XP: ${player.xp} / ${player.nextXp}</p>
-        <p>💪 Сила: ${player.strength}</p>
-        <p>🏃‍♂️ Витривалість: ${player.stamina}</p>
-        <p>🧘‍♂️ Гнучкість: ${player.flexibility}</p>
-        <p>🎯 Очки навичок: ${player.skillPoints}</p>
-        <p>🏋️‍♂️ Рівень тренування: ${player.trainingLevel}</p>
-        <p>⚔️ Рівень рейду: ${player.raidLevel}</p>
+    function updateStats() {
+      document.getElementById("stats").innerHTML = `
+        <h2>📊 Рівень: ${player.level}</h2>
+        <p>XP: ${Math.floor(player.xp)} / ${player.nextXp}</p>
       `;
     }
 
-    function gainXp(amount) {
-      player.xp += amount;
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function startWorkout() {
+      currentWorkout = [];
+      const count = getRandomInt(3, 5);
+      const used = new Set();
+      while (currentWorkout.length < count) {
+        const idx = getRandomInt(0, exercises.length - 1);
+        if (!used.has(idx)) {
+          const ex = exercises[idx];
+          const reps = getRandomInt(ex.min, ex.max);
+          currentWorkout.push({ ...ex, reps });
+          used.add(idx);
+        }
+      }
+      showWorkout("🔥 Твоє тренування на сьогодні:");
+    }
+
+    function startRaid() {
+      currentWorkout = [];
+      // Вибираємо 6 найважчих вправ (за XP/одиницю)
+      const hardest = exercises.slice().sort((a, b) => b.xpPerUnit - a.xpPerUnit).slice(0, 6);
+      hardest.forEach(ex => {
+        const reps = getRandomInt(ex.max - 10, ex.max + 20);
+        currentWorkout.push({ ...ex, reps });
+      });
+      showWorkout("💀 Рейд: виживи або впади");
+    }
+
+    function showWorkout(title) {
+      const list = document.getElementById("exerciseList");
+      let html = `<h3>${title}</h3><ul>`;
+      currentWorkout.forEach(ex => {
+        html += `<li>${ex.name}: ${ex.reps}</li>`;
+      });
+      html += "</ul>";
+      list.innerHTML = html;
+    }
+
+    function completeWorkout() {
+      if(currentWorkout.length === 0){
+        alert("Спочатку згенеруй тренування або рейд!");
+        return;
+      }
+      let xp = 0;
+      currentWorkout.forEach(ex => {
+        xp += ex.reps * ex.xpPerUnit;
+      });
+      player.xp += xp;
       while (player.xp >= player.nextXp) {
         player.xp -= player.nextXp;
         player.level++;
-        player.skillPoints += 3;
         player.nextXp = Math.floor(player.nextXp * 1.2);
-        alert("🔵 Новий рівень отримано!");
+        alert("🎉 Вітаю! Ти підняв рівень!");
       }
-      saveData();
-      updateDisplay();
+      currentWorkout = [];
+      document.getElementById("exerciseList").innerHTML = "Натисни кнопку, щоб згенерувати тренування.";
+      save();
+      updateStats();
     }
 
-    function train() {
-      const xpGained = 10 + player.trainingLevel * 5 + player.stamina;
-      gainXp(xpGained);
-      player.trainingLevel++;
-    }
-
-    function raid() {
-      const xpGained = 20 + player.raidLevel * 10 + player.strength;
-      gainXp(xpGained);
-      player.raidLevel++;
-    }
-
-    function upgradeStat(stat) {
-      if (player.skillPoints > 0) {
-        player[stat]++;
-        player.skillPoints--;
-        saveData();
-        updateDisplay();
-      } else {
-        alert("❌ Недостатньо очок навичок!");
-      }
-    }
-
-    loadData();
-    updateDisplay();
+    // Ініціалізація
+    load();
+    updateStats();
   </script>
-
 </body>
 </html>
-
+    
