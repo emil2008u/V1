@@ -1,105 +1,157 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Solo Leveling: Прокачка Героя</title>
-<style>
-  body {
-    font-family: monospace;
-    background: linear-gradient(135deg, #000000, #1a1a1a);
-    color: #00ffcc;
-    max-width: 650px;
-    margin: 40px auto;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 0 30px #00ffcc33;
-  }
-  h1 {
-    text-align: center;
-    color: #00ffee;
-    text-shadow: 0 0 10px #00ffee;
-  }
-  .box {
-    background: #111;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    border: 1px solid #00ffaa33;
-  }
-  .box div {
-    margin: 6px 0;
-  }
-  .desc {
-    font-style: italic;
-    color: #77ffe1;
-    white-space: pre-line;
-    min-height: 60px;
-  }
-  input[type=number], button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    font-size: 1rem;
-    border-radius: 6px;
-    border: none;
-  }
-  input {
-    background: #222;
-    color: #00ffcc;
-  }
-  button {
-    background: #00ffcc;
-    color: #000;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  button:hover:not(:disabled) {
-    background: #00ccaa;
-  }
-  button:disabled {
-    background: #004d40;
-    cursor: not-allowed;
-  }
-  #raidTimer {
-    text-align: center;
-    margin-top: 8px;
-    font-weight: bold;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Solo Leveling UI</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(#0c0c0c, #121212);
+      color: #00ccff;
+      padding: 30px;
+      text-shadow: 0 0 5px #00ccff;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00ccff;
+      text-shadow: 0 0 10px #00ccff;
+      font-size: 32px;
+    }
+
+    #stats {
+      border: 2px solid #00ccff;
+      border-radius: 10px;
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.4);
+      margin-bottom: 20px;
+      box-shadow: 0 0 15px #00ccff88;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    button {
+      margin: 5px;
+      padding: 12px 18px;
+      font-size: 15px;
+      border: 1px solid #00ccff;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #0f0f0f;
+      color: #00ccff;
+      text-shadow: 0 0 5px #00ccff;
+      transition: 0.2s ease;
+      box-shadow: 0 0 10px #00ccff33;
+    }
+
+    button:hover {
+      background-color: #00ccff;
+      color: #000;
+      text-shadow: none;
+      box-shadow: 0 0 15px #00ccff;
+    }
+
+    .btn-section {
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
 
-<h1>📟 Solo Leveling: Прокачка Героя</h1>
+  <h1>🌀 Solo Leveling: System</h1>
 
-<div class="box">
-  <div><strong>Рівень:</strong> <span id="level">1</span></div>
-  <div><strong>XP:</strong> <span id="xp">0</span> / <span id="nextXp">100</span></div>
-  <div><strong>Сила:</strong> <span id="strength">5</span></div>
-  <div><strong>Витривалість:</strong> <span id="stamina">5</span></div>
-  <div><strong>Гнучкість:</strong> <span id="flexibility">5</span></div>
-  <div><strong>Очки навичок:</strong> <span id="skillPoints">0</span></div>
-</div>
+  <div id="stats"></div>
 
-<div class="box">
-  <h3>📘 Тренування</h3>
-  <div class="desc" id="trainingDesc">Натисни "Отримати Завдання", щоб побачити вправи</div>
-  <button id="startTrainingBtn">📝 Отримати Завдання</button>
-  <div id="realTask"></div>
-  <button id="confirmDoneBtn" style="display:none;">✅ Я виконав тренування</button>
-  <div><strong>Рівень тренування:</strong> <span id="trainingLevel">1</span> / 100</div>
-</div>
+  <div class="btn-section">
+    <button onclick="train()">🏋️‍♂️ Тренування</button>
+    <button onclick="raid()">⚔️ Рейд</button>
+    <br><br>
+    <button onclick="upgradeStat('strength')">💪 Прокачати Силу</button>
+    <button onclick="upgradeStat('stamina')">🏃‍♂️ Прокачати Витривалість</button>
+    <button onclick="upgradeStat('flexibility')">🧘‍♂️ Прокачати Гнучкість</button>
+  </div>
 
-<div class="box">
-  <h3>🛡 Рейд</h3>
-  <div class="desc" id="raidDesc">Натисни "Вийти на рейд", щоб розпочати</div>
-  <button id="doRaidBtn">⚔️ Вийти на рейд</button>
-  <div id="raidTimer"></div>
-  <div><strong>Рівень рейду:</strong> <span id="raidLevel">1</span> / 1000</div>
-</div>
+  <script>
+    let player = {
+      level: 1,
+      xp: 0,
+      nextXp: 100,
+      strength: 5,
+      stamina: 5,
+      flexibility: 5,
+      skillPoints: 0,
+      trainingLevel: 1,
+      raidLevel: 1
+    };
 
-<div class="box">
-  <h3>⚙️ Розподіл Очок Навичок</h3>
-  <label>Сила:</label>
-  <input type="number" id="strengthPoints" min="0" value="0" />
+    function saveData() {
+      localStorage.setItem('playerData', JSON.stringify(player));
+    }
+
+    function loadData() {
+      const saved = localStorage.getItem('playerData');
+      if (saved) {
+        player = JSON.parse(saved);
+      }
+    }
+
+    function updateDisplay() {
+      document.getElementById('stats').innerHTML = `
+        <p>📈 Рівень: ${player.level}</p>
+        <p>⭐ XP: ${player.xp} / ${player.nextXp}</p>
+        <p>💪 Сила: ${player.strength}</p>
+        <p>🏃‍♂️ Витривалість: ${player.stamina}</p>
+        <p>🧘‍♂️ Гнучкість: ${player.flexibility}</p>
+        <p>🎯 Очки навичок: ${player.skillPoints}</p>
+        <p>🏋️‍♂️ Рівень тренування: ${player.trainingLevel}</p>
+        <p>⚔️ Рівень рейду: ${player.raidLevel}</p>
+      `;
+    }
+
+    function gainXp(amount) {
+      player.xp += amount;
+      while (player.xp >= player.nextXp) {
+        player.xp -= player.nextXp;
+        player.level++;
+        player.skillPoints += 3;
+        player.nextXp = Math.floor(player.nextXp * 1.2);
+        alert("🔵 Новий рівень отримано!");
+      }
+      saveData();
+      updateDisplay();
+    }
+
+    function train() {
+      const xpGained = 10 + player.trainingLevel * 5 + player.stamina;
+      gainXp(xpGained);
+      player.trainingLevel++;
+    }
+
+    function raid() {
+      const xpGained = 20 + player.raidLevel * 10 + player.strength;
+      gainXp(xpGained);
+      player.raidLevel++;
+    }
+
+    function upgradeStat(stat) {
+      if (player.skillPoints > 0) {
+        player[stat]++;
+        player.skillPoints--;
+        saveData();
+        updateDisplay();
+      } else {
+        alert("❌ Недостатньо очок навичок!");
+      }
+    }
+
+    loadData();
+    updateDisplay();
+  </script>
+
+</body>
+</html>
 
